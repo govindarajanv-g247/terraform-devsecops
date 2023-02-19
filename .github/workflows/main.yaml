@@ -46,12 +46,16 @@ jobs:
           only_warn: true
           iac_dir: 'aws'
       - name: Terrascan
-        uses: addnab/docker-run-action@v3
+        run: |
+          docker pull accurics/terrascan:latest
+          docker run --rm -w /src -v $(pwd):/src accurics/terrascan . -o json | tee terrascan-output.json
+        continue-on-error: true
+      - uses: actions/upload-artifact@v2
         with:
-            image: docker://accurics/terrascan:latest
-            entrypoint: "/bin/sh -c"
-            run: |
-                /go/bin/terrascan scan . -o json > terrascan-output.json
+          name: terrascan
+          path: terrascan-output.json
+        if: always()                        # what is this for?
+
   sast-tfsec:
     runs-on: ubuntu-20.04
     name: tfsec
