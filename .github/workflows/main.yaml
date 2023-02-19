@@ -45,6 +45,13 @@ jobs:
           policy_type: 'aws'
           only_warn: true
           iac_dir: 'aws'
+      - name: Terrascan
+        uses: addnab/docker-run-action@v3
+        with:
+            image: docker://accurics/terrascan:latest
+            entrypoint: "/bin/sh -c"
+            run: |
+                /go/bin/terrascan scan . -o json > terrascan-output.json
   sast-tfsec:
     runs-on: ubuntu-20.04
     name: tfsec
