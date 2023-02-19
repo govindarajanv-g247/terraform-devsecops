@@ -6,7 +6,8 @@ on:
       - main
 
 jobs:
-  tflint:
+  code-quality:
+    name: tflint
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout
@@ -26,9 +27,27 @@ jobs:
           name: TFLint
           path: tflint-output.json
         if: always()                        # what is this for?
+  
+  sast:
+    name: terrascan
+    needs: code-quality
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Run Terrascan
+        id: terrascan
+        uses: accurics/terrascan-action@v1
+        with:
+          iac_type: 'terraform'
+          iac_version: 'v14'
+          policy_type: 'aws'
+          only_warn: true
+          iac_dir: 'aws'
   test:
     name: terratest
     runs-on: ubuntu-20.04
-    needs: tflint
+    needs: sast
     steps:
       - run: echo "This is a terratest step"
