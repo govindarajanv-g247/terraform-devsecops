@@ -48,7 +48,7 @@ jobs:
       - name: Terrascan
         run: |
           docker pull accurics/terrascan:latest
-          docker run --rm -w /src -v $(pwd):/src accurics/terrascan . -o json | tee terrascan-output.json
+          docker run --rm -w /src -v $(pwd):/src accurics/terrascan scan . -o json | tee terrascan-output.json
         continue-on-error: true
       - uses: actions/upload-artifact@v2
         with:
