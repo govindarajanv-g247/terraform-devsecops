@@ -74,6 +74,8 @@ jobs:
 
       - name: Checkov GitHub Action
         uses: bridgecrewio/checkov-action@v12
+        env:
+          GITHUB_PAT: ${{ secrets.GITHUB_PAT }}
         
       - name: Upload SARIF file
         uses: github/codeql-action/upload-sarif@v2
