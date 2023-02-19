@@ -45,6 +45,7 @@ jobs:
           policy_type: 'aws'
           only_warn: true
           iac_dir: 'aws'
+          sarif_upload: true
       - name: Terrascan
         run: |
           docker pull accurics/terrascan:latest
