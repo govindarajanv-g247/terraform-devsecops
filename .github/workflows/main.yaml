@@ -28,7 +28,7 @@ jobs:
           path: tflint-output.json
         if: always()                        # what is this for?
   
-  sast:
+  sast-terrascan:
     name: terrascan
     needs: code-quality
     runs-on: ubuntu-20.04
@@ -45,8 +45,10 @@ jobs:
           policy_type: 'aws'
           only_warn: true
           iac_dir: 'aws'
-  tfsec:
+  sast-tfsec:
     runs-on: ubuntu-20.04
+    name: tfsec
+    needs: code-quality
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -58,9 +60,26 @@ jobs:
         continue-on-error: true  
       - name: tfsec
         uses: aquasecurity/tfsec-action@v1.0.0
+  
+  sast-checkov:
+    name: checkov
+    runs-on: ubuntu-latest
+    needs: code-quality  
+  
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Checkov GitHub Action
+        uses: bridgecrewio/checkov-action@v12
+        
+      - name: Upload SARIF file
+        uses: github/codeql-action/upload-sarif@v2
+        if: success() || failure()
+        with:
+          sarif_file: results.sarif
   test:
     name: terratest
     runs-on: ubuntu-20.04
-    needs: sast
+    needs: [sast-tfsec, sast-checkov, sast-terrascan]
     steps:
       - run: echo "This is a terratest step"
