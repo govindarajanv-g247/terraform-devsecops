@@ -21,8 +21,12 @@ jobs:
         run: |
           tflint -f json aws
           tflint -f json aws > tflint-output.json
-          pwd
-          ls -rlt
+          cat tflint-output.json
+          
+          directory=$(pwd)
+          echo $directory
+          output=$(ls -rlt)
+          echo $output
         continue-on-error: true
       - uses: actions/upload-artifact@v2
         with:
