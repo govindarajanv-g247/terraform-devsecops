@@ -2,7 +2,7 @@ name: Terraform                               # workflow name
 
 on:
   push:                                       
-    branches:                                 # similar to "only" in GitLab
+    branches:                                 
       - main
 
 jobs:
@@ -24,9 +24,9 @@ jobs:
         continue-on-error: true
       - uses: actions/upload-artifact@v2
         with:
-          name: TFLint
+          name: tflint
           path: tflint-output.json
-        if: always()                        # what is this for?
+        if: always()           
   
   sast-terrascan:
     name: terrascan
@@ -35,18 +35,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-
-      - name: Run Terrascan
-        id: terrascan
-        uses: accurics/terrascan-action@v1
-        with:
-          iac_type: 'terraform'
-          iac_version: 'v14'
-          policy_type: 'aws'
-          only_warn: true
-          iac_dir: 'aws'
-          sarif_upload: true
-      - name: Terrascan
+      - name: terrascan
         run: |
           docker pull accurics/terrascan:latest
           docker run --rm -w /src -v $(pwd):/src accurics/terrascan scan . -o json | tee terrascan-output.json
@@ -55,7 +44,7 @@ jobs:
         with:
           name: terrascan
           path: terrascan-output.json
-        if: always()                        # what is this for?
+        if: always()                       
 
   sast-tfsec:
     runs-on: ubuntu-20.04
@@ -75,7 +64,7 @@ jobs:
         with:
           name: tfsec
           path: tfsec-output.json
-        if: always()                        # what is this for?
+        if: always()                
   sast-checkov:
     name: checkov
     runs-on: ubuntu-latest
@@ -91,7 +80,7 @@ jobs:
         with:
           name: checkov-terraform
           path: checkov-output.json
-        if: always()                        # what is this for?
+        if: always()             
   test:
     name: terratest
     runs-on: ubuntu-20.04
